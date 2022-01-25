@@ -4,6 +4,17 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
+using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Connections;
+
+
 
 namespace HermesChatTeamB_v3
 {
@@ -21,22 +32,54 @@ namespace HermesChatTeamB_v3
             services.AddDbContext<ApplicationContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
+
             services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationContext>()
             .AddDefaultTokenProviders();
             services.AddControllersWithViews();
+
+            //// Register IUserTracker used by ChatHub.
+            services.AddSingleton(typeof(IUserTracker), typeof(UserTracker));
+
+            services.AddSignalR();
+            services.AddMvc();
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseDeveloperExceptionPage();
-            app.UseHttpsRedirection();
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+            }
+
+            //// Redirect the request to HTTPS, if its Http.
+            ////app.UseRewriter(new RewriteOptions().AddRedirectToHttps()); ////301, 44346
+
             app.UseStaticFiles();
 
-            app.UseRouting();
 
             app.UseAuthentication();
+
+            
+            //// Use - SignalR & let it know to intercept and map any request having chatHub.
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<ChatHub>("chatHub");
+            });
+
+
             app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<ChatHub>("chatHub");
+
+            });
 
             app.UseEndpoints(endpoints =>
             {
@@ -45,5 +88,30 @@ namespace HermesChatTeamB_v3
                 pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
+
+        /*public void Configure(IApplicationBuilder app)
+    {
+        app.UseDeveloperExceptionPage();
+        app.UseHttpsRedirection();
+        app.UseStaticFiles();
+
+        app.UseRouting();
+
+        app.UseAuthentication();
+
+        //// Use - SignalR & let it know to intercept and map any request having chatHub.
+        app.UseSignalR(routes =>
+        {
+            routes.MapHub<ChatHub>("chatHub");
+        });
+
+        app.UseAuthorization();
+
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllerRoute(
+            name: "default",
+            pattern: "{controller=Home}/{action=Index}/{id?}");
+        });*/
     }
 }
