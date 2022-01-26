@@ -21,8 +21,9 @@ namespace HermesChatTeamB_v3
         {
             Claim nameIdentifierClaim = context.User.Claims.FirstOrDefault(j => j.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
             var userId = nameIdentifierClaim.Value;
-            var imageUrl = $"https://graph.facebook.com/{userId}/picture?type=square";
-            return new UserInformation(context.ConnectionId, context.User.Identity.Name, imageUrl);
+            // var imageUrl = $"https://graph.facebook.com/{userId}/picture?type=square";
+            // return new UserInformation(context.ConnectionId, context.User.Identity.Name, imageUrl);
+            return new UserInformation(context.ConnectionId, context.User.Identity.Name);
         }
     }
 }

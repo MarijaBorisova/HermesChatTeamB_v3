@@ -22,13 +22,14 @@ namespace HermesChatTeamB_v3
         /// <param name="connection">The hub connection context.</param>
         /// <param name="userInfo">The user information</param>
         /// <returns>The task.</returns>
-        Task AddUserAsync(HubConnectionContext connection, UserInformation userInfo);
+        Task AddUserAsync(HubCallerContext connection, UserInformation userInfo);
 
         /// <summary>
         /// Removes user from User Tracker data store. This would be called when a user leaves the chat hub.
         /// </summary>
         /// <param name="connection">The hub connection context.</param>
         /// <returns>The task.</returns>
-        Task RemoveUserAsync(HubConnectionContext connection);
+        Task RemoveUserAsync(HubCallerContext connection);
+       
     }
 }

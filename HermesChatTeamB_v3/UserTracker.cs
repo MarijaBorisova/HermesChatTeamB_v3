@@ -16,7 +16,7 @@ namespace HermesChatTeamB_v3
         /// The private storage for keeping the track of online users connected to chat hub.
         /// We are going to register the User Tracker as singleton, so no need to make it as static as it would be resued once the class is initialized.
         /// </summary>
-        private readonly ConcurrentDictionary<HubConnectionContext, UserInformation> onlineUserStore = new ConcurrentDictionary<HubConnectionContext, UserInformation>();
+        private readonly ConcurrentDictionary<HubCallerContext, UserInformation> onlineUserStore = new ConcurrentDictionary<HubCallerContext, UserInformation>();
 
         /// <summary>
         /// Add user to User Tracker data store. This would be called when a user joins the chat hub.
@@ -24,7 +24,7 @@ namespace HermesChatTeamB_v3
         /// <param name="connection">The hub connection context.</param>
         /// <param name="userInfo">The user information</param>
         /// <returns>The task.</returns>
-        public async Task AddUserAsync(HubConnectionContext connection, UserInformation userInfo)
+        public async Task AddUserAsync(HubCallerContext connection, UserInformation userInfo)
         {
             //// Add the connection and user to the local storage.
             onlineUserStore.TryAdd(connection, userInfo);
@@ -42,7 +42,7 @@ namespace HermesChatTeamB_v3
         /// </summary>
         /// <param name="connection">The hub connection context.</param>
         /// <returns>The task.</returns>
-        public async Task RemoveUserAsync(HubConnectionContext connection)
+        public async Task RemoveUserAsync(HubCallerContext connection)
         {
             //// Remove the connection and user from the local storage.
             if (onlineUserStore.TryRemove(connection, out var userInfo))

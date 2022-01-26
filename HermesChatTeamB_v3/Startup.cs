@@ -29,6 +29,7 @@ namespace HermesChatTeamB_v3
 
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddDbContext<ApplicationContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -41,8 +42,9 @@ namespace HermesChatTeamB_v3
             //// Register IUserTracker used by ChatHub.
             services.AddSingleton(typeof(IUserTracker), typeof(UserTracker));
 
-            services.AddSignalR();
             services.AddMvc();
+            services.AddSignalR();
+            
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -61,19 +63,24 @@ namespace HermesChatTeamB_v3
             ////app.UseRewriter(new RewriteOptions().AddRedirectToHttps()); ////301, 44346
 
             app.UseStaticFiles();
-
+            app.UseRouting();
 
             app.UseAuthentication();
 
             
             //// Use - SignalR & let it know to intercept and map any request having chatHub.
-            app.UseSignalR(routes =>
+            //app.UseSignalR(routes =>
+            //{
+            //    routes.MapHub<ChatHub>("chatHub");
+            //});
+
+
+            /*app.UseMvc(routes =>
             {
-                routes.MapHub<ChatHub>("chatHub");
-            });
+                routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
+            });*/
 
-
-            app.UseAuthorization();
+        app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

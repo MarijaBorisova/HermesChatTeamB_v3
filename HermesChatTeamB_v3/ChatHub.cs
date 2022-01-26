@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.WebSockets;
 
 
+
+
 namespace HermesChatTeamB_v3
 {
     /// <summary>
@@ -45,12 +47,15 @@ namespace HermesChatTeamB_v3
         /// </summary>
         /// <returns>The task.</returns>
         public override async Task OnConnectedAsync()
-        {
+        { 
+            /*await Groups.AddToGroupAsync(Context.ConnectionId, "SignalR Users");
+            await base.OnConnectedAsync();*/
+        
             var user = Helper.GetUserInformationFromContext(Context);
-            await this.userTracker.AddUserAsync(Context.Connection, user);
-            await Clients.All.InvokeAsync("UsersJoined", new UserInformation[] { user });
+            await this.userTracker.AddUserAsync(Context, user);
+            await Clients.All.SendAsync("UsersJoined", new UserInformation[] { user }); //InvokeAsync
             //// On connection, refresh online list.
-            await Clients.All.InvokeAsync("SetUsersOnline", await GetOnlineUsersAsync());
+            await Clients.All.SendAsync("SetUsersOnline", await GetOnlineUsersAsync());
 
             await base.OnConnectedAsync();
         }
@@ -63,11 +68,12 @@ namespace HermesChatTeamB_v3
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             var user = Helper.GetUserInformationFromContext(Context);
-            await Clients.All.InvokeAsync("UsersLeft", new UserInformation[] { user });
-            await this.userTracker.RemoveUserAsync(Context.Connection);
+            await Clients.All.SendAsync("UsersLeft", new UserInformation[] { user });
+            await this.userTracker.RemoveUserAsync(Context);
             //// On disconnection, refresh online list.
-            await Clients.All.InvokeAsync("SetUsersOnline", await GetOnlineUsersAsync());
+            await Clients.All.SendAsync("SetUsersOnline", await GetOnlineUsersAsync());
             await base.OnDisconnectedAsync(exception);
+
         }
 
         /// <summary>
@@ -78,7 +84,8 @@ namespace HermesChatTeamB_v3
         public async Task Send(string message)
         {
             UserInformation user = Helper.GetUserInformationFromContext(Context);
-            await Clients.All.InvokeAsync("Send", user.Name, message, user.ImageUrl);
+            // await Clients.All.InvokeAsync("Send", user.Name, message, user.ImageUrl);
+            await Clients.All.SendAsync("Send", user.Name, message);
         }
     }
 }

@@ -11,17 +11,17 @@
         /// <param name="connectionId">The connection identifier.</param>
         /// <param name="name">The name of user.</param>
         /// <param name="imageUrl">The url of user's profile picture.</param>
-        public UserInformation(string connectionId, string name, string imageUrl)
+        public UserInformation(string connectionId, string name)
         {
             this.ConnectionId = connectionId;
             this.Name = name;
-            this.ImageUrl = imageUrl;
+            //this.ImageUrl = imageUrl;
         }
 
         /// <summary>
         /// Gets the image path of the user
         /// </summary>
-        public string ImageUrl { get; }
+       // public string ImageUrl { get; }
 
         /// <summary>
         /// Gets the connection identifier.
